@@ -2,10 +2,10 @@ version: 0.2
 
 env:
   parameter-store:
-    DB_HOST: "dev/database/host"
+    DB_HOST: "/dev/database/host"
     DB_NAME: "/dev/database/db_name"
     DB_USER: "/dev/database/user"
-    DB_PASSWORD: "dev/database/password"
+    DB_PASSWORD: "/dev/database/password"
 
 phases:
   install:
