@@ -33,19 +33,19 @@ phases:
     commands:
       - echo Running unit tests...
       - mvn test
-      - echo Packaging compiled code into JAR...
+      - echo Packaging compiled code into binary...
       - mvn package
 
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Verifying packaged JAR...
+      - echo Verifying packaged binary...
       - mvn verify
 
-      - echo Copying appspec in artifacts directory
-      - cp appspec.yml target
-      - echo Copying scripts in artifacts directory
-      - cp -r scripts target
+      # - echo Copying appspec in artifacts directory
+      # - cp appspec.yml target
+      # - echo Copying scripts in artifacts directory
+      # - cp -r scripts target
       - echo Listing build files in target directory..
       - ls -alh target
 
