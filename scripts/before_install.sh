@@ -3,8 +3,9 @@
 # Install Java if it's not installed
 if ! command -v java &> /dev/null
 then
-    sudo apt-get update -y
-    sudo apt-get install -y openjdk-8-jdk -y
+    wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add - 
+    sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
+    sudo apt-get install -y java-1.8.0-amazon-corretto-jdk
 fi
 
 # Creating a backup of Jar binary
