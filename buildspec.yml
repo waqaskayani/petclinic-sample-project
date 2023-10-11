@@ -42,11 +42,7 @@ phases:
       - echo Verifying packaged binary...
       - mvn verify
 
-      # - echo Copying appspec in artifacts directory
-      # - cp appspec.yml target
-      # - echo Copying scripts in artifacts directory
-      # - cp -r scripts target
-      - echo Listing build files in target directory..
+      - echo Listing files in target directory..
       - ls -alh target
 
 artifacts:
