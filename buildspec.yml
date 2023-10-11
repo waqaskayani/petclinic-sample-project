@@ -1,0 +1,46 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto8
+    commands:
+      - apt-get update
+      - java -version
+      - mvn -version 
+
+  pre_build:
+    commands:
+      - echo Cleaning any previously compiled classes or created artifacts to ensure a fresh build...
+      - mvn clean
+      - echo Running Maven validate...
+      - mvn validate
+      - echo Compiling code...
+      - mvn compile
+      - echo Compiling test code...
+      - mvn test-compile
+
+  build:
+    commands:
+      - echo Running unit tests...
+      - mvn test
+      - echo Packaging compiled code into JAR...
+      - mvn package
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Verifying packaged JAR...
+      - mvn verify
+
+      - echo Copying appspec in artifacts directory
+      - cp appspec.yml target
+      - echo Copying scripts in artifacts directory
+      - cp -r scripts target
+      - echo Listing build files in target directory..
+      - ls -alh target
+
+artifacts:
+  files:
+    - target/**/*
+  discard-paths: no
