@@ -44,6 +44,7 @@ phases:
 
       - echo Listing files in target directory..
       - ls -alh target
+      - ls -alh scripts
 
 artifacts:
   files:
