@@ -1,5 +1,12 @@
 version: 0.2
 
+env:
+  parameter-store:
+    DB_HOST: "dev/database/host"
+    DB_NAME: "/dev/database/db_name"
+    DB_USER: "/dev/database/user"
+    DB_PASSWORD: "dev/database/password"
+
 phases:
   install:
     runtime-versions:
@@ -8,6 +15,8 @@ phases:
       - apt-get update
       - java -version
       - mvn -version 
+      - echo $DB_HOST
+      - echo $DB_NAME
 
   pre_build:
     commands:
