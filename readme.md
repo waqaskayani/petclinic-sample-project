@@ -103,6 +103,11 @@ While our current deployment of the SpringBoot PetClinic application on AWS via 
 - Extensive testing in the CI/CD Pipeline and implementing branching development cycle
 - Blue/Green Deployment to reduce downtime and risk
 
+### 6. IaC Improvements
+- Modules can be created for resources for reusability
+- Terraform state can be moved to remote backend, enabling collaboration between team members, versioning state files, and providing a history of changes
+
+
 As we continue to iterate on this project, the goal is to address these considerations, integrating more sophisticated features, enhancing security, and ensuring high availability and reliability.
 
 ## Contributions
