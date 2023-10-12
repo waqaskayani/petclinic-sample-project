@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Attempting to stop the server..."
 DESTINATION_PATH="/home/ubuntu/app-deployment"
 SERVICE_NAME="petclinic-app"
 
