@@ -22,4 +22,4 @@ export DB_PASSWORD
 
 # Add the command to start your application here; for example:
 cd $DESTINATION_PATH
-sudo mvn tomcat7:run
+sudo mvn tomcat7:run -DDB_HOST=$DB_HOST -DDB_USER=$DB_USER -DDB_PASSWORD=$DB_PASSWORD -DDB_NAME=$DB_NAME
