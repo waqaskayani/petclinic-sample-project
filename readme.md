@@ -68,7 +68,7 @@ After a successful deployment, you can access the PetClinic application:
 - Password for RDS database server master username is created using terraform random module, using specific length and use of special characters. The value is directly passed to RDS password as a secure parameter and is also stored in SSM Parameter store to be used later on for connecting to it.
 - Security Groups are tightly scoped, and all resources only allow specific traffic required for it.
   - **EC2:** Only allows traffic from ALB security group on port 9966 for tcp protocol. And traffic from Instance connect for SSH port 22.
-  - **ALB:** Since this is the point of contact for public traffic towards application, the traffic is allowed from 0.0.0.0 only on specific HTTP (80) and HTTPS (443) ports.
+  - **ALB:** Since this is the point of contact for public traffic towards application, the traffic is allowed from 0.0.0.0 only on specific HTTP (80) and HTTPS (443) ports. All traffic from port 80 is redirected to 443 for SSL termination.
   - **CodeBuild:** AWS CodeBuild does not require any incoming traffic, so no ingress rules are created for its security group.
   - **Database:** RDS for MySQL is only accessed from EC2 servers for application connectivity and CodeBuild during tests. It is only allowed traffic to MySQL port 3306 from their respective security groups.
 - AWS Certificate Manager (ACM) certificates with Application Load Balancer (ALB) are used, ensuring end-to-end encryption. This setup automates the renewal and deployment of certificates and also leverages the security benefits of ALB, including automatic cipher updates and integrations with AWS WAF for additional layers of protection. 
