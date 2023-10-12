@@ -4,7 +4,7 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
 
 ## Architecture Diagram
 
-<img src="media/architecture.png" width="500" height="575">
+<img src="media/architecture.png" width="500" height="550">
 
 ## Prerequisites
 
