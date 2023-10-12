@@ -11,11 +11,12 @@ else
 # Create the systemd service file
 sudo tee "${SERVICE_FILE}" > /dev/null <<EOL
 [Unit]
-Description=PetClinit Application
+Description=PetClinic Application
 After=network.target
 
 [Service]
 Type=simple
+EnvironmentFile=/usr/bin/pet-clinic.env
 ExecStart=/usr/bin/run_app.sh #script that starts the application
 Restart=on-failure
 RestartSec=10
