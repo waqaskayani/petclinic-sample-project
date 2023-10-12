@@ -42,7 +42,15 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
 - Once successfully installed, the status should change to *Available*.
 - Navigate to AWS CodePipeline page where pipeline is created and click on *Release changes*.
 ![CodePipeline Triger](media/codepipeline.png)
-- Verify the pipeline runs successfully and deploys the application to the newly created infrastructure.
+- AWS CodePipeline is divided into 3 phases:
+  - **Source:** Trigger the pipeline as per selected branch and forwards the artifacts for build
+  - **Build:** This stage performs required actions related to build and test lifecycle of application using buildspec.yml. It performs the following actions:
+    - Code is validated and compiled
+    - Tests are run on the compiled source code using a suitable test framework. Following is a screenshot of successful tests:
+      <img src="media/build_tests.png" width="700" height="300">
+    - Post-testing, code is packaged and verified, readying it for deployment
+  - **Deploy:** AWS CodeDeploy is used to deploy the application on AWS EC2 instances using appspec.yml reference file and provided scripts
+- Verify all the steps in pipeline run successfully and that the application is deployed to the newly created infrastructure.
 
 ## Accessing the Application
 After a successful deployment, you can access the PetClinic application:
