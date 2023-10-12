@@ -27,6 +27,7 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
   - **repository_id:** Required repository ID in GitHub in username/repository format.
   - **hosted_zone_id:** Hosted Zone ID for Route53 to use for application records
   - **domain_record:** Domain record to create for application hosting.
+  - **repository_branch:** As required, the branch can be configured to trigger the pipeline. By default, *main* branch is selected.
   - **common_tags.Environment:** the environment tag is set to dev by default. If this is changed, change the following files as well to match the environment:
     - buildspec.yml
     - scripts/run_app.sh
