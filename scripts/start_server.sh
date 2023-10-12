@@ -34,7 +34,7 @@ sudo systemctl enable "$SERVICE_NAME"
 
 sudo systemctl start "$SERVICE_NAME"
 if [ $? -eq 0 ]; then
-    echo "Started ${SERVICE_NAME} successfully..."
+    echo "Attempting to start service ${SERVICE_NAME}..."
 else
     echo "Problem starting service ${SERVICE_NAME}, please look into configurations.."
 fi
