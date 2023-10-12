@@ -33,11 +33,6 @@ variable "instance_type" {
     type = string
 }
 
-variable "pem_key_name" {
-    default = "ec2-key-pair"
-    type = string
-}
-
 variable "alb_delete_protection" {
     default = false
     type = bool  
