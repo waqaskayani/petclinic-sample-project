@@ -1,195 +1,96 @@
-# Spring PetClinic Sample Application
+# SprintBoot PetClinic Application Deployment
 
+This repository contains the codebase for the "PetClinic" Java Spring Boot application and includes the necessary Terraform scripts for infrastructure setup and scripts for CI/CD using AWS CodePipeline. The application is configured for deployment on AWS EC2 instances in autoscaling group with an RDS backend.
 
-## Understanding the Spring Petclinic application with a few diagrams
-<a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
+## Architecture Diagram
 
-## Running petclinic locally
-```
-	git clone https://github.com/spring-projects/spring-petclinic.git
-	mvn tomcat7:run
-```
+![PetClinic - Architecture Diagram](media/architecture.png)
 
-You can then access petclinic here: http://localhost:9966/petclinic/
+## Prerequisites
 
-## In case you find a bug/suggested improvement for Spring Petclinic
-Our issue tracker is available here: https://github.com/spring-projects/spring-petclinic/issues
+- An AWS account
+- Configured AWS CLI with necessary access
+- Terraform v1.4.3 installed on your local machine
+- Basic knowledge of Java, Spring Boot, AWS, Terraform, and CI/CD concepts
 
-## Working with Petclinic in Eclipse/STS
+## Repository Structure
 
-### prerequisites
-The following items should be installed in your system:
-* Maven 3 (http://www.sonatype.com/books/mvnref-book/reference/installation.html)
-* git command line tool (https://help.github.com/articles/set-up-git)
-* Eclipse with the m2e plugin (m2e is installed by default when using the STS (http://www.springsource.org/sts) distribution of Eclipse)
+- `/` - Java Spring Boot application codebase (PetClinic)
+- `infra/` - Terraform scripts for provisioning AWS infrastructure
+- `scripts/` - Auxiliary scripts for application setup and configuration during CI/CD
 
-Note: when m2e is available, there is an m2 icon in Help -> About dialog.
-If m2e is not there, just follow the install process here: http://eclipse.org/m2e/download/
+## Setting Up Infrastructure with Terraform
 
+- Setup AWS CLI with profile named *aws_profile*.
+- Navigate to the `infra/` directory.
+- Customize the `terraform.tfvars` file with your environment-specific values. Make sure the following variables are configured, as they are required:
+  - **repository_id:** Required repository ID in GitHub in username/repository format.
+  - **hosted_zone_id:** Hosted Zone ID for Route53 to use for application records
+  - **domain_record:** Domain record to create for application hosting.
+- Initialize the Terraform workspace with `terraform init`.
+- Apply the Terraform scripts with `terraform apply`.
+- Verify the infrastructure setup in AWS Console.
 
-### Steps:
+## Application Deployment with AWS CodePipeline
+- Once the infrastructure is provisioned, make sure to complete the AWS CodeStar connection, to ensure CodePipeline is connected to GitHub repository.
+- Navigate to AWS CodeStar connection [page](https://us-east-2.console.aws.amazon.com/codesuite/settings/connections?region=us-east-2) and region where infrastructure is provisioned. Click on *Update pending connection* and follow prompts in browser window to install the connection app:
+![CodeStar Connection](media/codestar_connection.png)
+- Once successfully installed, the status should change to *Available*.
+- Navigate to AWS CodePipeline page where pipeline is created and click on *Release changes*.
+![CodePipeline Triger](media/codepipeline.png)
+- Verify the pipeline runs successfully and deploys the application to the newly created infrastructure.
 
-1) In the command line
-```
-git clone https://github.com/spring-projects/spring-petclinic.git
-```
-2) Inside Eclipse
-```
-File -> Import -> Maven -> Existing Maven project
-```
+## Accessing the Application
+After a successful deployment, you can access the PetClinic application:
+- Navigate to AWS Target Groups and wait for registered target to get healthy. Once it is healthy it should look as following:
+![Healthy Target Group](media/target_group.png)
+- Retrieve the domain name of application configured previously AWS Console.
+- Open a web browser and navigate to `https://<DOMAIN_RECORD_VARIABLE>/petclinic/`.
+- You should now see the PetClinic application running.
+![Working application](media/petclinic.png)
 
+## Security and Permissions
+-  EC2 Instance Connect Endpoints are used so bastion is not required to SSH into servers.
+<br /> **Note:** If region is changed, respective AWS IPs (from [this](https://github.com/joetek/aws-ip-ranges-json/blob/master/ip-ranges-ec2-instance-connect.json) link) are to be whitelisted in security group named *instance_connect_sg* to ensure Instance Connect works as expected.
 
-## Looking for something in particular?
+- Password for RDS database server master username is created using terraform random module, using specific length and use of special characters. The value is directly passed to RDS password as a secure parameter and is also stored in SSM Parameter store to be used later on for connecting to it.
+- Security Groups are tightly scoped, and all resources only allow specific traffic required for it.
+  - **EC2:** Only allows traffic from ALB security group on port 9966 for tcp protocol. And traffic from Instance connect for SSH port 22.
+  - **ALB:** Since this is the point of contact for public traffic towards application, the traffic is allowed from 0.0.0.0 only on specific HTTP (80) and HTTPS (443) ports.
+  - **CodeBuild:** AWS CodeBuild does not require any incoming traffic, so no ingress rules are created for its security group.
+  - **Database:** RDS for MySQL is only accessed from EC2 servers for application connectivity and CodeBuild during tests. It is only allowed traffic to MySQL port 3306 from their respective security groups.
+- AWS Certificate Manager (ACM) certificates with Application Load Balancer (ALB) are used, ensuring end-to-end encryption. This setup automates the renewal and deployment of certificates and also leverages the security benefits of ALB, including automatic cipher updates and integrations with AWS WAF for additional layers of protection. 
+<br /> The certificate is created using terraform with the *domain* variable provided. 
+- IAM least privileged principle is used. For all the entities, the permissions created using terraform with specific policies only allow specific Actions on specific resources as required.
+- Encryption for data-at-rest is implemented for our infrastructure securing both our computing and database resources:
+  - **EBS Encryption:** Elastic Block Store (EBS) volume attached to our EC2 instances are encrypted with AWS's default EBS encryption.
+  - **RDS Encryption:** AWS RDS instances are secured with RDS encryption, employing AWS's default encryption keys. This feature protects our stored data, automated backups, read replicas, and snapshots using the AES-256 encryption algorithm.
 
-<table>
-  <tr>
-    <th width="300px">Java Config</th><th width="300px"></th>
-  </tr>
-  <tr>
-    <td>Java Config branch</td>
-    <td>
-      Petclinic uses XML configuration by default. In case you'd like to use Java Config instead, there is a Java Config branch available <a href="https://github.com/spring-projects/spring-petclinic/tree/javaconfig">here</a>. Thanks to Antoine Rey for his contribution.     
-    </td>
-  </tr>
-  <tr>
-    <th width="300px">Inside the 'Web' layer</th><th width="300px">Files</th>
-  </tr>
-  <tr>
-    <td>Spring MVC - XML integration</td>
-    <td><a href="/src/main/resources/spring/mvc-view-config.xml">mvc-view-config.xml</a></td>
-  </tr>
-  <tr>
-    <td>Spring MVC - ContentNegotiatingViewResolver</td>
-    <td><a href="/src/main/resources/spring/mvc-view-config.xml">mvc-view-config.xml</a></td>
-  </tr>
-  <tr>
-    <td>JSP custom tags</td>
-    <td>
-      <a href="/src/main/webapp/WEB-INF/tags">WEB-INF/tags</a>
-      <a href="/src/main/webapp/WEB-INF/jsp/owners/createOrUpdateOwnerForm.jsp">createOrUpdateOwnerForm.jsp</a></td>
-  </tr>
-  <tr>
-    <td>webjars</td>
-    <td>
-      <a href="/pom.xml">webjars declaration inside pom.xml</a> <br />
-      <a href="/src/main/resources/spring/mvc-core-config.xml#L24">Resource mapping in Spring configuration</a> <br />
-      <a href="/src/main/webapp/WEB-INF/jsp/fragments/staticFiles.jsp#L12">sample usage in JSP</a></td>
-    </td>
-  </tr>
-  <tr>
-    <td>Dandelion-datatables</td>
-    <td>
-      <a href="/src/main/webapp/WEB-INF/jsp/owners/ownersList.jsp">ownersList.jsp</a> 
-      <a href="/src/main/webapp/WEB-INF/jsp/vets/vetList.jsp">vetList.jsp</a> 
-      <a href="/src/main/webapp/WEB-INF/web.xml">web.xml</a> 
-      <a href="/src/main/resources/dandelion/datatables/datatables.properties">datatables.properties</a> 
-   </td>
-  </tr>
-  <tr>
-    <td>Thymeleaf branch</td>
-    <td>
-      <a href="http://www.thymeleaf.org/petclinic.html">See here</a></td>
-  </tr>
-  <tr>
-    <td>Branch using GemFire and Spring Data GemFire instead of ehcache (thanks Bijoy Choudhury)</td>
-    <td>
-      <a href="https://github.com/bijoych/spring-petclinic-gemfire">See here</a></td>
-  </tr>
-</table>
+## Considerations and Future Work
 
-<table>
-  <tr>
-    <th width="300px">'Service' and 'Repository' layers</th><th width="300px">Files</th>
-  </tr>
-  <tr>
-    <td>Transactions</td>
-    <td>
-      <a href="/src/main/resources/spring/business-config.xml">business-config.xml</a>
-       <a href="/src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java">ClinicServiceImpl.java</a>
-    </td>
-  </tr>
-  <tr>
-    <td>Cache</td>
-      <td>
-      <a href="/src/main/resources/spring/tools-config.xml">tools-config.xml</a>
-       <a href="/src/main/java/org/springframework/samples/petclinic/service/ClinicServiceImpl.java">ClinicServiceImpl.java</a>
-    </td>
-  </tr>
-  <tr>
-    <td>Bean Profiles</td>
-      <td>
-      <a href="/src/main/resources/spring/business-config.xml">business-config.xml</a>
-       <a href="/src/test/java/org/springframework/samples/petclinic/service/ClinicServiceJdbcTests.java">ClinicServiceJdbcTests.java</a>
-       <a href="/src/main/webapp/WEB-INF/web.xml">web.xml</a>
-    </td>
-  </tr>
-  <tr>
-    <td>JdbcTemplate</td>
-    <td>
-      <a href="/src/main/resources/spring/business-config.xml">business-config.xml</a>
-      <a href="/src/main/java/org/springframework/samples/petclinic/repository/jdbc">jdbc folder</a></td>
-  </tr>
-  <tr>
-    <td>JPA</td>
-    <td>
-      <a href="/src/main/resources/spring/business-config.xml">business-config.xml</a>
-      <a href="/src/main/java/org/springframework/samples/petclinic/repository/jpa">jpa folder</a></td>
-  </tr>
-  <tr>
-    <td>Spring Data JPA</td>
-    <td>
-      <a href="/src/main/resources/spring/business-config.xml">business-config.xml</a>
-      <a href="/src/main/java/org/springframework/samples/petclinic/repository/springdatajpa">springdatajpa folder</a></td>
-  </tr>
-</table>
+While our current deployment of the SpringBoot PetClinic application on AWS via Terraform and AWS CodePipeline demonstrates a robust and functional infrastructure, there are several areas where further enhancements and refinements can be made. Below are outlined key considerations and potential future work to improve our setup:
 
-<table>
-  <tr>
-    <th width="300px">Others</th><th width="300px">Files</th>
-  </tr>
-  <tr>
-    <td>Gradle branch</td>
-    <td>
-      <a href="https://github.com/whimet/spring-petclinic">See here</a></td>
-  </tr>
-</table>
+### 1. Security Enhancements
+- Implementing Custom KMS Keys
+- IAM Policies and Roles refinement
 
+### 2. Architecture Improvements
+- Containers and Orchestration
+- Designing for Multi-Region deployment or implementing DR plan
 
-## Interaction with other open source projects
+### 3. Observability and Monitoring
+- Enhanced Logging and Monitoring for improved insight into application performance and infrastructure health
+- Automated Alerting implementation to detect, escalate, and respond
 
-One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found some bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
-Here is a list of them:
+### 4. Cost Optimization
+- Right-Sizing Resources
+- Consider Spot Instances where applicable, keeping in mind the trade-offs in availability
 
-<table>
-  <tr>
-    <th width="300px">Name</th>
-    <th width="300px"> Issue </th>
-  </tr>
+### 5. CI/CD Enhancements
+- Extensive testing in the CI/CD Pipeline and implementing branching development cycle
+- Blue/Green Deployment to reduce downtime and risk
 
-  <tr>
-    <td>Spring JDBC: simplify usage of NamedParameterJdbcTemplate</td>
-    <td> <a href="https://jira.springsource.org/browse/SPR-10256"> SPR-10256</a> and <a href="https://jira.springsource.org/browse/SPR-10257"> SPR-10257</a> </td>
-  </tr>
-  <tr>
-    <td>Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility</td>
-    <td>
-      <a href="https://hibernate.atlassian.net/browse/HV-790"> HV-790</a> and <a href="https://hibernate.atlassian.net/browse/HV-792"> HV-792</a>
-      </td>
-  </tr>
-  <tr>
-    <td>Spring Data: provide more flexibility when working with JPQL queries</td>
-    <td>
-      <a href="https://jira.springsource.org/browse/DATAJPA-292"> DATAJPA-292</a>
-      </td>
-  </tr>  
-  <tr>
-    <td>Eclipse: validation bug when working with .tag/.tagx files (has only been fixed for Eclipse 4.3 (Kepler)). <a href="https://github.com/spring-projects/spring-petclinic/issues/14">See here for more details.</a></td>
-    <td>
-      <a href="https://issuetracker.springsource.com/browse/STS-3294"> STS-3294</a>
-    </td>
-  </tr>    
-</table>
+As we continue to iterate on this project, the goal is to address these considerations, integrating more sophisticated features, enhancing security, and ensuring high availability and reliability.
 
-
-
-
+## Contributions
+If you wish to contribute to this project, please fork the repository and submit a pull request.
