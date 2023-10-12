@@ -9,7 +9,7 @@ if [ -f "$SERVICE_FILE" ]; then
     echo "Service file $SERVICE_FILE already exists."
 else
     # Create the systemd service file
-    sudo cat > "$SERVICE_FILE" <<EOL
+    sudo tee "${SERVICE_FILE}" > /dev/null <<EOL
     [Unit]
     Description=PetClinit Application
     After=network.target
@@ -17,8 +17,8 @@ else
     [Service]
     Type=simple
     User=ubuntu # or specify a specific user to run the app
-    WorkingDirectory=$DESTINATION_PATH # directory of your Maven application
-    ExecStart=$DESTINATION_PATH/scripts/run_app.sh # script that starts the application
+    WorkingDirectory=${DESTINATION_PATH} # directory of your Maven application
+    ExecStart=${DESTINATION_PATH}/scripts/run_app.sh # script that starts the application
     Restart=on-failure
     RestartSec=10
     TimeoutStartSec=30
@@ -33,3 +33,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable "$SERVICE_NAME"
 
 sudo systemctl start "$SERVICE_NAME"
+if [ $? -eq 0 ]; then
+    echo "Started ${SERVICE_NAME} successfully..."
+else
+    echo "Problem starting service ${SERVICE_NAME}, please look into configurations.."
+fi
