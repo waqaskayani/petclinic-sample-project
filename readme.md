@@ -62,7 +62,7 @@ After a successful deployment, you can access the PetClinic application:
 ![Working application](media/petclinic.png)
 
 ## Security and Permissions
--  EC2 Instance Connect Endpoints are used so bastion is not required to SSH into servers.
+-  EC2 Instance Connect Endpoints are used so bastion or ec2-pem file is not required to SSH into servers.
 <br /> **Note:** If region is changed, respective AWS IPs (from [this](https://github.com/joetek/aws-ip-ranges-json/blob/master/ip-ranges-ec2-instance-connect.json) link) are to be whitelisted in security group named *instance_connect_sg* to ensure Instance Connect works as expected.
 
 - Password for RDS database server master username is created using terraform random module, using specific length and use of special characters. The value is directly passed to RDS password as a secure parameter and is also stored in SSM Parameter store to be used later on for connecting to it.
