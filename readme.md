@@ -1,4 +1,4 @@
-# SprintBoot PetClinic Application Deployment
+# SpringBoot PetClinic Application Deployment
 
 This repository contains the codebase for the "PetClinic" Java Spring Boot application and includes the necessary Terraform scripts for infrastructure setup and scripts for CI/CD using AWS CodePipeline. The application is configured for deployment on AWS EC2 instances in autoscaling group with an RDS backend.
 
