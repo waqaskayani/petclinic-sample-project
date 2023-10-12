@@ -6,6 +6,16 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
 
 <img src="media/architecture.png" width="500" height="550">
 
+Some considerations from architectural and reliability perspective, if following changes are made:
+- Using EC2 in ASGs, minumum count is increased to `2`
+- RDS database Multi-AZ variable is set to `true`
+
+We can achieve the following:
+- Recovery Time Objective (RTO) is the targeted duration of time within which a business process must be restored. It can be within minutes.
+- Recovery Point Objective (RPO) is the maximum targeted period in which data might be lost. EC2 does not store data and state, For RDS multi-AZ database, the RPO is essentially zero, as the database is synchronously replicated.
+
+Thus, by making above two changes, we can make sure the architecture is further more reliable and is highly available as well, with a very short RTO and RPO. 
+
 ## Prerequisites
 
 - An AWS account
