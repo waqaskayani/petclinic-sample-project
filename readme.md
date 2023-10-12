@@ -23,7 +23,7 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
 
 - Setup AWS CLI with profile named *aws_profile*.
 - Navigate to the `infra/` directory.
-- Customize the `terraform.tfvars` file with your environment-specific values. Make sure the following variables are configured, as they are required:
+- Customize the `terraform.tfvars` file with your environment-specific values. Make sure the following variables are configured as required:
   - **repository_id:** Required repository ID in GitHub in username/repository format.
   - **hosted_zone_id:** Hosted Zone ID for Route53 to use for application records
   - **domain_record:** Domain record to create for application hosting.
