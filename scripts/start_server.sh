@@ -25,7 +25,7 @@ else
     
     [Install]
     WantedBy=multi-user.target
-    EOL
+EOL
 fi
 
 sudo chmod 644 "$SERVICE_FILE"
