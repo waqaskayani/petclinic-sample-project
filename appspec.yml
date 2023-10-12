@@ -17,4 +17,4 @@ hooks:
   ApplicationStop:
     - location: scripts/stop_server.sh
       timeout: 45
-      runas: ubuntu
+      runas: root
