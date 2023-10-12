@@ -2,7 +2,6 @@ resource "aws_launch_template" "app_lt" {
     name          = "app-lt-${var.environment}"
     image_id      = data.aws_ami.ubuntu.id
     instance_type = var.instance_type
-    key_name      = var.pem_key_name
     block_device_mappings {
       device_name = "/dev/sda1"
 
