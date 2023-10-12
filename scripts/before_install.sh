@@ -10,6 +10,10 @@ fi
 
 DESTINATION_PATH="/home/ubuntu/app-deployment"
 
+# Updating permission for current user
+CURRENT_USER=$(whoami)
+sudo chown -R $CURRENT_USER:$CURRENT_USER $DESTINATION_PATH
+
 # If there's an existing target directory
 if [ -d "${DESTINATION_PATH}/target" ]; then
     cd ${DESTINATION_PATH}
