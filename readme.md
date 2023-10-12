@@ -47,7 +47,7 @@ This repository contains the codebase for the "PetClinic" Java Spring Boot appli
   - **Build:** This stage performs required actions related to build and test lifecycle of application using buildspec.yml. It performs the following actions:
     - Code is validated and compiled
     - Tests are run on the compiled source code using a suitable test framework. Following is a screenshot of successful tests:
-      <img src="media/build_tests.png" width="700" height="300">
+      <img src="media/build_tests.png" width="900" height="400">
     - Post-testing, code is packaged and verified, readying it for deployment
   - **Deploy:** AWS CodeDeploy is used to deploy the application on AWS EC2 instances using appspec.yml reference file and provided scripts
 - Verify all the steps in pipeline run successfully and that the application is deployed to the newly created infrastructure.
